@@ -21,7 +21,7 @@ class NetworkModule {
     @Provides
     fun provideRetrofit(client: OkHttpClient): Retrofit{
         return Retrofit.Builder()
-            .baseUrl("https://jsonplaceholder.typicode.com/")
+            .baseUrl("https://kinopoiskapiunofficial.tech/")
             .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
