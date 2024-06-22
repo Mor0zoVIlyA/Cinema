@@ -13,7 +13,7 @@ import dagger.hilt.android.components.ViewModelComponent
 @InstallIn(ViewModelComponent::class)
 interface RepositoryModule  {
     @Binds
-    fun bindRepository(repositoryImpl: RemoteRepositoryImpl): RemoteRepository
+    fun bindRemoteRepository(repositoryImpl: RemoteRepositoryImpl): RemoteRepository
     @Binds
-    fun bindRepository(repositoryImpl: LocalRepositoryImpl): LocalRepository
+    fun bindLocalRepository(repositoryImpl: LocalRepositoryImpl): LocalRepository
 }

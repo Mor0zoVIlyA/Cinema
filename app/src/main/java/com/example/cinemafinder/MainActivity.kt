@@ -18,7 +18,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.cinemafinder.ui.theme.CinemaFinderTheme
+import com.main_screen.presentation.LocalDataBottomPanel
 import com.main_screen.presentation.MainScreen
+import com.main_screen.presentation.RemoteDataBottomPanel
 import com.main_screen.presentation.view_models.LocalMainViewModel
 import com.main_screen.presentation.view_models.RemoteMainViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -51,7 +53,13 @@ fun MyApp() {
             MainScreen(
                 state = uiState,
                 itemClick = mainViewModel::itemClick,
-                longItemClick = mainViewModel::longClick
+                longItemClick = mainViewModel::longClick,
+                navController=navController,
+                bottomPanel =  {
+                    RemoteDataBottomPanel {
+                        navController.navigate("localMainScreen")
+                    }
+                }
             )
         }
         composable("localMainScreen"){
@@ -60,7 +68,13 @@ fun MyApp() {
             MainScreen(
                 state = uiState,
                 itemClick = mainViewModel::itemClick,
-                longItemClick = mainViewModel::longClick
+                longItemClick = mainViewModel::longClick,
+                navController=navController,
+                bottomPanel =  {
+                    LocalDataBottomPanel {
+                        navController.navigate("remoteMainScreen")
+                    }
+                }
             )
         }
         composable("details/{itemId}") { backStackEntry ->
