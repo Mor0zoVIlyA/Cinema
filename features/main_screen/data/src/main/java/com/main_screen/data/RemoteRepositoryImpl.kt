@@ -26,9 +26,6 @@ class RemoteRepositoryImpl @Inject constructor(
     private val retrofit: Retrofit,
     @ApplicationContext private val context: Context
 ) : RemoteRepository {
-    private val connectivityManager =
-        context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-
     override suspend fun fetchFilms(filmRequestType: String): Result<List<FilmCard>> =
         withContext(Dispatchers.IO) {
             return@withContext try {
@@ -45,8 +42,7 @@ class RemoteRepositoryImpl @Inject constructor(
         }
 
     override fun internetConnectionFlow() = callbackFlow {
-
-        Log.d("TAG", "internetConnectionFlow: qweqwe")
+        val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val callback = object : ConnectivityManager.NetworkCallback() {
             override fun onAvailable(network: Network) {
                 trySend(true)
@@ -71,7 +67,6 @@ class RemoteRepositoryImpl @Inject constructor(
         trySend(isConnected)
 
         awaitClose {
-            Log.d("TAG", "internetConnectionFlow: 123123")
             connectivityManager.unregisterNetworkCallback(callback)
         }
     }

@@ -37,6 +37,7 @@ dependencies {
     implementation libs.appcompat
     implementation libs.material
     implementation project(':features:main_screen:domain')
+    implementation project(":database")
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
     androidTestImplementation libs.espresso.core

@@ -1,6 +1,8 @@
 package com.main_screen.data.di
 
+import com.main_screen.data.LocalRepositoryImpl
 import com.main_screen.data.RemoteRepositoryImpl
+import com.main_screen.domain.LocalRepository
 import com.main_screen.domain.RemoteRepository
 import dagger.Binds
 import dagger.Module
@@ -12,4 +14,6 @@ import dagger.hilt.android.components.ViewModelComponent
 interface RepositoryModule  {
     @Binds
     fun bindRepository(repositoryImpl: RemoteRepositoryImpl): RemoteRepository
+    @Binds
+    fun bindRepository(repositoryImpl: LocalRepositoryImpl): LocalRepository
 }

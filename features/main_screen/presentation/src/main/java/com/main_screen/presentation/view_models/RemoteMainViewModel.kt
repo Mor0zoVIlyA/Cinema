@@ -1,5 +1,7 @@
 package com.main_screen.presentation.view_models
 
+import android.util.Log
+import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.lifecycle.viewModelScope
 import com.main_screen.domain.FilmCard
 import com.main_screen.domain.use_cases.FetchFilmsUseCase
@@ -8,6 +10,7 @@ import com.main_screen.domain.use_cases.NetworkMonitorUseCase
 import com.main_screen.presentation.R
 import com.main_screen.presentation.us_state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,36 +29,28 @@ class RemoteMainViewModel @Inject constructor(
     )
 
     init {
-        viewModelScope.launch {
-            val result = fetchFilmsUseCase.fetchFilms()
-            if (result is Result.Success){
-                uiState.value = uiState.value.copy(filmList = result.data)
+        viewModelScope.launch (Dispatchers.IO){
+            combine(
+                filmListFlow,
+                networkMonitorUseCase.isNetworkAvailable()
+            ) { filmList, internetAvailable ->
+                if (internetAvailable && filmList.isEmpty()) {
+                    val fetchResult = fetchFilmsUseCase.fetchFilms()
+                    if (fetchResult is Result.Success) {
+                        uiState.value = uiState.value.copy(filmList = fetchResult.data)
+                    }
+                }
+                if (!internetAvailable && filmList.isEmpty()) {
+                    uiState.value = uiState.value.copy(internetAbility = false)
+                }
+
+            }.collect{
             }
         }
-//        combine(
-//            filmListFlow
-//        ) { filmList, internetAvailable ->
-//            if (internetAvailable && filmList.isEmpty()) {
-//                val fetchResult = fetchFilmsUseCase.fetchFilms()
-//                if (fetchResult is Result.Success) {
-//                    filmListFlow.value = fetchResult.data
-//                }
-//            }
-//            if (!internetAvailable && filmList.isEmpty()) {
-//                uiState.value = uiState.value.copy(internetAbility = false)
-//            }
-//
-//        }
-
     }
 
-    fun getFilmList(): StateFlow<List<FilmCard>> = filmListFlow.asStateFlow()
     override fun getUiState(): StateFlow<UiState> {
         return uiState.asStateFlow()
-    }
-
-    override fun getType(): ViewModelType {
-        return ViewModelType.REMOTE
     }
     override fun longClick(filmCard: FilmCard) {
         TODO("Not yet implemented")

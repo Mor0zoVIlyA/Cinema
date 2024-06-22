@@ -7,10 +7,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 abstract class BaseViewModel: ViewModel() {
     abstract fun getUiState(): StateFlow<UiState>
-    abstract fun getType(): ViewModelType
     abstract fun longClick(filmCard: FilmCard)
     abstract fun itemClick(filmCard: FilmCard)
-    enum class ViewModelType{
-        LOCAL, REMOTE
-    }
 }
