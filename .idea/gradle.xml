@@ -13,6 +13,10 @@
             <option value="$PROJECT_DIR$/core" />
             <option value="$PROJECT_DIR$/database" />
             <option value="$PROJECT_DIR$/features" />
+            <option value="$PROJECT_DIR$/features/description_screen" />
+            <option value="$PROJECT_DIR$/features/description_screen/data" />
+            <option value="$PROJECT_DIR$/features/description_screen/domain" />
+            <option value="$PROJECT_DIR$/features/description_screen/presentation" />
             <option value="$PROJECT_DIR$/features/main_screen" />
             <option value="$PROJECT_DIR$/features/main_screen/data" />
             <option value="$PROJECT_DIR$/features/main_screen/domain" />

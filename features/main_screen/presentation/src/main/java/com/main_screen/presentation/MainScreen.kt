@@ -57,7 +57,7 @@ import com.main_screen.presentation.us_state.UiState
 @Composable
 fun MainScreen(
     state: UiState,
-    itemClick: (FilmCard) -> Unit,
+    itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
     navController: NavController,
     bottomPanel:  @Composable ()-> Unit
@@ -85,7 +85,8 @@ fun MainScreen(
                         FilmItem(
                             filmCard = film,
                             itemClick = itemClick,
-                            longItemClick = longItemClick
+                            longItemClick = longItemClick,
+                            navController = navController
                         )
                     }
                 }
@@ -133,9 +134,9 @@ fun shimmerBrush(showShimmer: Boolean = true, targetValue: Float = 1000f): Brush
 @Composable
 fun FilmItem(
     filmCard: FilmCard,
-    itemClick: (FilmCard) -> Unit,
+    itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
-
+    navController: NavController
     ) {
     val hapticFeedBack = LocalHapticFeedback.current
 
@@ -143,7 +144,7 @@ fun FilmItem(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { itemClick(filmCard) },
+                onClick = { itemClick(filmCard, navController) },
                 onLongClick = {
                     longItemClick(filmCard)
                     hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)

@@ -3,6 +3,7 @@ package com.main_screen.presentation.view_models
 import android.util.Log
 import androidx.compose.foundation.text.selection.DisableSelection
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.main_screen.domain.FilmCard
 import com.main_screen.domain.use_cases.FetchFilmsUseCase
 import com.main_screen.domain.Result
@@ -60,7 +61,7 @@ class RemoteMainViewModel @Inject constructor(
         }
     }
 
-    override fun itemClick(filmCard: FilmCard) {
-
+    override fun itemClick(filmCard: FilmCard, navController: NavController) {
+        navController.navigate("remoteDetails/${filmCard.filmId}")
     }
 }

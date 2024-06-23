@@ -15,6 +15,10 @@ abstract class FilmEntityDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract fun insertFilm(filmDB: FilmDB)
 
+    @Transaction
+    @Query("SELECT * FROM film WHERE id = :id")
+    abstract suspend fun getFilmDescriptionById(id: Int): FilmWithDescription
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     protected abstract suspend fun insertFilmDescription(description: FilmDescriptionEntity)
 

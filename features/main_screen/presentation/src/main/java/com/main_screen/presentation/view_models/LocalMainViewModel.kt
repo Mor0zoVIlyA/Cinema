@@ -2,6 +2,7 @@ package com.main_screen.presentation.view_models
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.navigation.NavController
 import com.main_screen.domain.FilmCard
 import com.main_screen.domain.use_cases.GetListFromDataBase
 import com.main_screen.presentation.R
@@ -33,7 +34,7 @@ class LocalMainViewModel @Inject constructor(
         TODO("Not yet implemented")
     }
 
-    override fun itemClick(filmCard: FilmCard) {
-        TODO("Not yet implemented")
+    override fun itemClick(filmCard: FilmCard, navController: NavController) {
+        navController.navigate("localDetails/${filmCard.filmId}")
     }
 }
