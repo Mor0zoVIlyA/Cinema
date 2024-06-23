@@ -26,7 +26,6 @@ class LocalMainViewModel @Inject constructor(
         }
     }
     override fun getUiState(): StateFlow<UiState> {
-        //TODO("Not yet implemented")
         return uiState.asStateFlow()
     }
 

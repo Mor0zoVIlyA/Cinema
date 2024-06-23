@@ -19,6 +19,7 @@ data class FilmDescriptionEntity(
     @PrimaryKey
     val filmId: Int,
     val genre: String,
+    val description: String,
     val country: String
 )
 

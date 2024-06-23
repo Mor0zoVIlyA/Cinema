@@ -7,6 +7,7 @@ import com.main_screen.domain.FilmCard
 import com.main_screen.domain.use_cases.FetchFilmsUseCase
 import com.main_screen.domain.Result
 import com.main_screen.domain.use_cases.NetworkMonitorUseCase
+import com.main_screen.domain.use_cases.SaveToDataBaseUseCase
 import com.main_screen.presentation.R
 import com.main_screen.presentation.us_state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class RemoteMainViewModel @Inject constructor(
     private val fetchFilmsUseCase: FetchFilmsUseCase,
-    private val networkMonitorUseCase: NetworkMonitorUseCase
+    private val networkMonitorUseCase: NetworkMonitorUseCase,
+    private val saveToDataBaseUseCase: SaveToDataBaseUseCase
 ) : BaseViewModel() {
     private val filmListFlow = MutableStateFlow<List<FilmCard>>(emptyList())
     private val uiState = MutableStateFlow(
@@ -53,10 +55,12 @@ class RemoteMainViewModel @Inject constructor(
         return uiState.asStateFlow()
     }
     override fun longClick(filmCard: FilmCard) {
-        TODO("Not yet implemented")
+        viewModelScope.launch(Dispatchers.IO) {
+            saveToDataBaseUseCase.saveFilm(filmCard)
+        }
     }
 
     override fun itemClick(filmCard: FilmCard) {
-        TODO("Not yet implemented")
+
     }
 }

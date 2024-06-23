@@ -8,18 +8,18 @@ import androidx.room.Transaction
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface FilmEntityDao {
+abstract class FilmEntityDao {
     @Query("SELECT * FROM film")
-    fun getAllFilms(): Flow<List<FilmDB>>
+    abstract fun getAllFilms(): Flow<List<FilmDB>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFilm(filmDB: FilmDB)
+    protected abstract fun insertFilm(filmDB: FilmDB)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertFilmDescription(description: FilmDescriptionEntity)
+    protected abstract suspend fun insertFilmDescription(description: FilmDescriptionEntity)
 
     @Transaction
-    suspend fun insertFilm(filmWithDescription: FilmWithDescription){
+    open suspend fun insertFilm(filmWithDescription: FilmWithDescription){
         insertFilm(filmWithDescription.film)
         insertFilmDescription(filmWithDescription.description)
     }
