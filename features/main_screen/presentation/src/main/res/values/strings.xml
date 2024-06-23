@@ -2,4 +2,8 @@
 <resources>
     <string name="top_from_internet">Top 100</string>
     <string name="favorites">Избранное</string>
+    <string name="remote_source">Remote source</string>
+    <string name="local_source">Local source</string>
+    <string name="no_internet_connection">Нет подключения к интернету</string>
+    <string name="check_internet_connection">Проверьте ваше интернет-соединение и попробуйте снова.</string>
 </resources>

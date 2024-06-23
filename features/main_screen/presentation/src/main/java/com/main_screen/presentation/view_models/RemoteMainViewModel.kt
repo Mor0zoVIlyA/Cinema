@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -26,28 +27,16 @@ class RemoteMainViewModel @Inject constructor(
     private val networkMonitorUseCase: NetworkMonitorUseCase,
     private val saveToDataBaseUseCase: SaveToDataBaseUseCase
 ) : BaseViewModel() {
-    private val filmListFlow = MutableStateFlow<List<FilmCard>>(emptyList())
     private val uiState = MutableStateFlow(
         UiState(R.string.top_from_internet, emptyList())
     )
 
     init {
-        viewModelScope.launch (Dispatchers.IO){
-            combine(
-                filmListFlow,
-                networkMonitorUseCase.isNetworkAvailable()
-            ) { filmList, internetAvailable ->
-                if (internetAvailable && filmList.isEmpty()) {
-                    val fetchResult = fetchFilmsUseCase.fetchFilms()
-                    if (fetchResult is Result.Success) {
-                        uiState.value = uiState.value.copy(filmList = fetchResult.data)
-                    }
-                }
-                if (!internetAvailable && filmList.isEmpty()) {
-                    uiState.value = uiState.value.copy(internetAbility = false)
-                }
-
-            }.collect{
+        viewModelScope.launch(Dispatchers.IO) {
+            networkMonitorUseCase.isNetworkAvailable().collect { internetAvailable ->
+                val filmList = uiState.value.filmList
+                tryDownload(internetAvailable, filmList)
+                checkLoadedData(internetAvailable, filmList)
             }
         }
     }
@@ -55,6 +44,7 @@ class RemoteMainViewModel @Inject constructor(
     override fun getUiState(): StateFlow<UiState> {
         return uiState.asStateFlow()
     }
+
     override fun longClick(filmCard: FilmCard) {
         viewModelScope.launch(Dispatchers.IO) {
             saveToDataBaseUseCase.saveFilm(filmCard)
@@ -63,5 +53,26 @@ class RemoteMainViewModel @Inject constructor(
 
     override fun itemClick(filmCard: FilmCard, navController: NavController) {
         navController.navigate("remoteDetails/${filmCard.filmId}")
+    }
+
+    private suspend fun tryDownload(internetAvailable: Boolean, filmList: List<FilmCard>) {
+        if (internetAvailable && filmList.isEmpty()) {
+            val fetchResult = fetchFilmsUseCase.fetchFilms()
+            if (fetchResult is Result.Success) {
+                uiState.value = uiState.value.copy(filmList = fetchResult.data)
+            }
+        }
+    }
+
+    private fun checkLoadedData(internetAvailable: Boolean, filmList: List<FilmCard>) {
+        if (!internetAvailable) {
+            if (filmList.isEmpty()) {
+                uiState.value = uiState.value.copy(internetAbility = false)
+            } else {
+                uiState.value = uiState.value.copy(internetAbility = true)
+            }
+        } else {
+            uiState.value = uiState.value.copy(internetAbility = true)
+        }
     }
 }
