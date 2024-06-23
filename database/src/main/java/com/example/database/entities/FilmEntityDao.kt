@@ -1,6 +1,7 @@
 package com.example.database.entities
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -27,5 +28,9 @@ abstract class FilmEntityDao {
         insertFilm(filmWithDescription.film)
         insertFilmDescription(filmWithDescription.description)
     }
+    @Query("SELECT id from film")
+    abstract fun favoriteId(): Flow<List<Int>>
 
+    @Delete
+    abstract suspend fun deleteFilm(user: FilmDB)
 }

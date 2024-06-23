@@ -5,6 +5,7 @@ import com.example.database.entities.FilmEntityDao
 import com.main_screen.data.api.ServiceApi
 import com.main_screen.data.mapper.toDataBaseModel
 import com.main_screen.data.mapper.toFilmCard
+import com.main_screen.data.mapper.toFilmDb
 import com.main_screen.data.utils.ImageDownloader
 import com.main_screen.domain.FilmCard
 import com.main_screen.domain.LocalRepository
@@ -43,6 +44,16 @@ class LocalRepositoryImpl @Inject constructor(
     }
 
     override suspend fun deleteFilm(filmCard: FilmCard) {
-        TODO("Not yet implemented")
+        try {
+            dao.deleteFilm(filmCard.toFilmDb(filmCard.posterUrl))
+        }catch (e:Exception){
+            if (e is CancellationException)
+                throw e
+            Log.d("TAG", "deleteFilm: $e")
+        }
+    }
+
+    override fun getFavoriteFilmsId(): Flow<List<Int>> {
+        return dao.favoriteId()
     }
 }

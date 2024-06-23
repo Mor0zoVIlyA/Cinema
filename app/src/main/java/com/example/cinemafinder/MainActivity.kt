@@ -64,7 +64,9 @@ fun MyApp(activity: MainActivity) {
                     RemoteDataBottomPanel {
                         navController.navigate("localMainScreen")
                     }
-                }
+                },
+                deleteClick = mainViewModel::delete
+
             )
         }
         composable("localMainScreen"){
@@ -79,7 +81,8 @@ fun MyApp(activity: MainActivity) {
                     LocalDataBottomPanel {
                         navController.navigate("remoteMainScreen")
                     }
-                }
+                },
+                deleteClick = mainViewModel::delete
             )
         }
         composable("remoteDetails/{itemId}") { backStackEntry ->

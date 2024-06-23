@@ -2,6 +2,7 @@ package com.example.database.entities
 
 import androidx.room.Embedded
 import androidx.room.Entity
+import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 
@@ -14,7 +15,14 @@ data class FilmDB (
     val path: String
 )
 
-@Entity
+@Entity(
+    foreignKeys = [ForeignKey(
+        entity = FilmDB::class,
+        parentColumns = ["id"],
+        childColumns = ["filmId"],
+        onDelete = ForeignKey.CASCADE
+    )]
+)
 data class FilmDescriptionEntity(
     @PrimaryKey
     val filmId: Int,
@@ -27,7 +35,7 @@ data class FilmWithDescription(
     @Embedded val film: FilmDB,
     @Relation(
         parentColumn = "id",
-        entityColumn = "filmId"
+        entityColumn = "filmId",
     )
     val description: FilmDescriptionEntity
 )

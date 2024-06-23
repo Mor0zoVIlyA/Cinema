@@ -11,7 +11,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -49,6 +49,7 @@ import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.main_screen.domain.FilmCard
+import com.main_screen.presentation.us_state.UiItem
 import com.main_screen.presentation.us_state.UiState
 
 
@@ -58,6 +59,7 @@ fun MainScreen(
     state: UiState,
     itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
+    deleteClick: (FilmCard, Boolean) -> Unit,
     navController: NavController,
     bottomPanel: @Composable () -> Unit
 ) {
@@ -82,9 +84,10 @@ fun MainScreen(
                             ) {
                                 items(state.filmList) { film ->
                                     FilmItem(
-                                        filmCard = film,
+                                        uiItem = film,
                                         itemClick = itemClick,
                                         longItemClick = longItemClick,
+                                        deleteClick = deleteClick,
                                         navController = navController
                                     )
                                 }
@@ -136,9 +139,10 @@ fun shimmerBrush(showShimmer: Boolean = true, targetValue: Float = 1000f): Brush
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FilmItem(
-    filmCard: FilmCard,
+    uiItem: UiItem,
     itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
+    deleteClick:(FilmCard, Boolean) -> Unit,
     navController: NavController
 ) {
     val hapticFeedBack = LocalHapticFeedback.current
@@ -147,16 +151,16 @@ fun FilmItem(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { itemClick(filmCard, navController) },
+                onClick = { itemClick(uiItem.filmCard, navController) },
                 onLongClick = {
-                    longItemClick(filmCard)
+                    longItemClick(uiItem.filmCard)
                     hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)
                 },
             )
     ) {
         val showShimmer = remember { mutableStateOf(true) }
         SubcomposeAsyncImage(
-            model = filmCard.posterUrl,
+            model = uiItem.filmCard.posterUrl,
             contentDescription = "Profile Picture",
             contentScale = ContentScale.Crop,
             modifier = Modifier
@@ -172,9 +176,26 @@ fun FilmItem(
             }
         }
 
-        Column {
-            Text(filmCard.year)
-            Text(filmCard.nameRu)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(uiItem.filmCard.year)
+                Text(uiItem.filmCard.nameRu)
+            }
+
+            Checkbox(
+                checked = uiItem.isFavorites,
+                onCheckedChange = {
+                    deleteClick(uiItem.filmCard, uiItem.isFavorites)
+                },
+
+            )
         }
     }
 }
