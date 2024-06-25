@@ -1,5 +1,7 @@
 package com.description_screen.presentation
 
+import android.util.Log
+import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +23,8 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -29,15 +33,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.SubcomposeAsyncImage
 import coil.compose.SubcomposeAsyncImageContent
 import com.description_screen.domain.models.FilmDescription
+import com.description_screen.presentation.view_model.DescriptionLocalViewModel
+import com.description_screen.presentation.view_model.DescriptionRemoteViewModel
+import dagger.hilt.android.lifecycle.withCreationCallback
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DescriptionScreen(
+private fun DescriptionScreen(
     descriptionState: FilmDescription,
     navController: NavController
 ) {
@@ -114,4 +122,29 @@ fun DescriptionScreen(
             }
         }
     )
+}
+@Composable
+fun DescriptionScreenFromLocal(
+    id: Int,
+    navController: NavController
+){
+    Log.d("TAG", "MyApp: receive ${id}")
+    val remoteViewModel = hiltViewModel<DescriptionLocalViewModel, DescriptionLocalViewModel.ViewModelFactory> { factory ->
+        factory.create(id)
+    }
+    val descriptionState by remoteViewModel.getUiState().collectAsState()
+    DescriptionScreen(descriptionState, navController)
+}
+
+@Composable
+fun DescriptionScreenFromRemote(
+    id: Int,
+    navController: NavController
+){
+    Log.d("TAG", "MyApp: receive ${id}")
+    val remoteViewModel = hiltViewModel<DescriptionRemoteViewModel, DescriptionRemoteViewModel.ViewModelFactory> { factory ->
+        factory.create(id)
+    }
+    val descriptionState by remoteViewModel.getUiState().collectAsState()
+    DescriptionScreen(descriptionState, navController)
 }

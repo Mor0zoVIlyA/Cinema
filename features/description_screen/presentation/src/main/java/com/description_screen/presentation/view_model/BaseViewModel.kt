@@ -18,7 +18,8 @@ abstract class BaseViewModel(
     )
     init{
         viewModelScope.launch(Dispatchers.IO) {
-            descriptionState.value = fetchDescription()
+            val data = fetchDescription()
+            descriptionState.value = data
         }
     }
     fun getUiState(): StateFlow<FilmDescription>{

@@ -1,5 +1,6 @@
 package com.main_screen.presentation.view_models
 
+import android.util.Log
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
 import com.main_screen.domain.FilmCard
@@ -67,6 +68,7 @@ class RemoteMainViewModel @Inject constructor(
     }
 
     override fun itemClick(filmCard: FilmCard, navController: NavController) {
+        Log.d("RemoteMainViewModel", "itemClick: navigate to${filmCard.filmId}")
         navController.navigate("remoteDetails/${filmCard.filmId}")
     }
 

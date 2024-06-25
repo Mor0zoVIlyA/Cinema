@@ -156,7 +156,9 @@ fun FilmItem(
         modifier = Modifier
             .fillMaxWidth()
             .combinedClickable(
-                onClick = { itemClick(uiItem.filmCard, navController) },
+                onClick = {
+                    itemClick(uiItem.filmCard, navController)
+                          },
                 onLongClick = {
                     longItemClick(uiItem.filmCard)
                     hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)

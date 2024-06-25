@@ -6,12 +6,12 @@ import com.example.database.entities.FilmWithDescription
 
 fun FullFilmInfo.toFilmDescription() = FilmDescription(
     kinopoiskId.toString(),
-    year.toString(),
-    nameRu,
-    posterUrl,
-    genres.joinToString { it.genre },
-    description,
-    countries.joinToString { it.country }
+    year.toString()?: "unable to receive data",
+    nameRu ?: "unable to receive data",
+    posterUrl ?: "unable to receive data",
+    genres.joinToString { it.genre } ?: "unable to receive data",
+    description ?: "unable to receive data",
+    countries.joinToString { it.country } ?: "unable to receive data"
 )
 
 fun FilmWithDescription.toFilmDescription() = FilmDescription(

@@ -1,5 +1,6 @@
 package com.description_screen.data
 
+import android.util.Log
 import com.description_screen.data.mappers.toFilmDescription
 import com.description_screen.data.network.NetworkApi
 import com.description_screen.domain.DescriptionRemoteRepository
@@ -18,6 +19,7 @@ class DescriptionRemoteRepositoryImpl @Inject constructor(
             if (e is CancellationException){
                 throw e
             }
+            Log.d("TAG", "fetchInfo: $e")
         }
         return EMPTY_DESCRIPTION
     }
