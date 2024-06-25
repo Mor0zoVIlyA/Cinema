@@ -10,10 +10,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -166,20 +168,23 @@ fun FilmItem(
             )
     ) {
         val showShimmer = remember { mutableStateOf(true) }
-        SubcomposeAsyncImage(
-            model = uiItem.filmCard.posterUrl,
-            contentDescription = "Profile Picture",
-            contentScale = ContentScale.Crop,
+        Box(
             modifier = Modifier
-                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
                 .width(150.dp)
-                .heightIn(min = 220.dp)
+                .height(220.dp)
+                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
         ) {
-            val state = painter.state
-            if (state is AsyncImagePainter.State.Success) {
-                showShimmer.value = false
-                state.result.drawable
-                SubcomposeAsyncImageContent()
+            SubcomposeAsyncImage(
+                model = uiItem.filmCard.posterUrl,
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            ) {
+                val state = painter.state
+                if (state is AsyncImagePainter.State.Success) {
+                    showShimmer.value = false
+                    SubcomposeAsyncImageContent()
+                }
             }
         }
 
