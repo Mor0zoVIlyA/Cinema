@@ -13,6 +13,8 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -22,9 +24,12 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -35,6 +40,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -43,7 +49,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.SemanticsProperties.Text
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -90,7 +98,7 @@ fun MainScreen(
                                     .weight(1f)
                             ) {
                                 items(state.filmList) { film ->
-                                    FilmItem(
+                                    FilmItem2(
                                         uiItem = film,
                                         itemClick = itemClick,
                                         longItemClick = longItemClick,
@@ -149,7 +157,7 @@ fun FilmItem(
     uiItem: UiItem,
     itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
-    deleteClick:(FilmCard, Boolean) -> Unit,
+    deleteClick: (FilmCard, Boolean) -> Unit,
     navController: NavController
 ) {
     val hapticFeedBack = LocalHapticFeedback.current
@@ -160,7 +168,7 @@ fun FilmItem(
             .combinedClickable(
                 onClick = {
                     itemClick(uiItem.filmCard, navController)
-                          },
+                },
                 onLongClick = {
                     longItemClick(uiItem.filmCard)
                     hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -207,9 +215,117 @@ fun FilmItem(
                     deleteClick(uiItem.filmCard, uiItem.isFavorites)
                 },
 
-            )
+                )
         }
     }
+}
+
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun FilmItem2(
+    uiItem: UiItem,
+    itemClick: (FilmCard, NavController) -> Unit,
+    longItemClick: (FilmCard) -> Unit,
+    deleteClick: (FilmCard, Boolean) -> Unit,
+    navController: NavController
+) {
+    val hapticFeedback = LocalHapticFeedback.current
+    val showShimmer = remember { mutableStateOf(true) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(8.dp)
+            .clip(RoundedCornerShape(8.dp))
+            .background(MaterialTheme.colorScheme.surface)
+            .combinedClickable(
+                onClick = {
+                    itemClick(uiItem.filmCard, navController)
+                },
+                onLongClick = {
+                    longItemClick(uiItem.filmCard)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                }
+            )
+            .padding(8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .width(150.dp)
+                .height(220.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
+        ) {
+            SubcomposeAsyncImage(
+                model = uiItem.filmCard.posterUrl,
+                contentDescription = "Profile Picture",
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.matchParentSize()
+            ) {
+                val state = painter.state
+                if (state is AsyncImagePainter.State.Success) {
+                    showShimmer.value = false
+                    SubcomposeAsyncImageContent()
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .weight(1f)
+                .padding(vertical = 8.dp),
+            verticalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = uiItem.filmCard.nameRu,
+                    style = MaterialTheme.typography.headlineSmall,
+                )
+                Text(
+                    text = uiItem.filmCard.year,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Checkbox(
+                    checked = uiItem.isFavorites,
+                    onCheckedChange = {
+                        deleteClick(uiItem.filmCard, uiItem.isFavorites)
+                    }
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Text(
+                    text = if (uiItem.isFavorites) "Favorite" else "Add to Favorites",
+                    style = MaterialTheme.typography.bodySmall
+                )
+            }
+            if (uiItem.isLoading){
+                HorizontalProgressBar(uiItem.loadingProgress ?: 0f)
+
+            }
+        }
+    }
+}
+
+@Composable
+fun HorizontalProgressBar(progress: Float) {
+    LinearProgressIndicator(
+        progress = progress,
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(8.dp),
+        color = MaterialTheme.colorScheme.primary,
+        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+    )
 }
 
 @Composable

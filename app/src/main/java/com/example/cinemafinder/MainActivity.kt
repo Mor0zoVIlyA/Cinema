@@ -1,6 +1,7 @@
 package com.example.cinemafinder
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,8 +17,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.description_screen.presentation.DescriptionScreenFromLocal
-import com.description_screen.presentation.DescriptionScreenFromRemote
+import com.description_screen.presentation.DescriptionScreen
+import com.description_screen.presentation.view_model.DescriptionLocalViewModel
+import com.description_screen.presentation.view_model.DescriptionRemoteViewModel
 import com.example.cinemafinder.ui.theme.CinemaFinderTheme
 import com.main_screen.presentation.LocalDataBottomPanel
 import com.main_screen.presentation.MainScreen
@@ -83,12 +85,20 @@ fun MyApp(activity: MainActivity) {
         }
         composable("remoteDetails/{itemId}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("itemId") ?: "-1"
-            DescriptionScreenFromRemote(id.toInt(), navController)
+            val localViewModel = hiltViewModel<DescriptionRemoteViewModel, DescriptionRemoteViewModel.ViewModelFactory> { factory ->
+                factory.create(id.toInt())
+            }
+            val descriptionState by localViewModel.getUiState().collectAsState()
+            DescriptionScreen(descriptionState, navController)
 
         }
         composable("localDetails/{itemId}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("itemId") ?: "-1"
-            DescriptionScreenFromLocal(id.toInt(), navController)
+            val localViewModel = hiltViewModel<DescriptionLocalViewModel, DescriptionLocalViewModel.ViewModelFactory> { factory ->
+                factory.create(id.toInt())
+            }
+            val descriptionState by localViewModel.getUiState().collectAsState()
+            DescriptionScreen(descriptionState, navController)
         }
     }
 }

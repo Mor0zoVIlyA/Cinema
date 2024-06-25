@@ -6,6 +6,7 @@ import androidx.navigation.NavController
 import com.main_screen.domain.FilmCard
 import com.main_screen.domain.use_cases.FetchFilmsUseCase
 import com.main_screen.domain.Result
+import com.main_screen.domain.states.DownloadProgress
 import com.main_screen.domain.use_cases.DeleteUseCase
 import com.main_screen.domain.use_cases.GetFavoritesIdUseCase
 import com.main_screen.domain.use_cases.NetworkMonitorUseCase
@@ -21,6 +22,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -63,10 +65,42 @@ class RemoteMainViewModel @Inject constructor(
 
     override fun longClick(filmCard: FilmCard) {
         viewModelScope.launch(Dispatchers.IO) {
-            saveToDataBaseUseCase.saveFilm(filmCard)
+            saveToDataBaseUseCase.saveFilm(filmCard).collect { downloadProgress ->
+                val previousList = uiState.value.filmList
+
+                when (downloadProgress) {
+                    is DownloadProgress.Success -> {
+                        val uiItemList = processList(filmCard, previousList){ uiItem ->
+                            uiItem.copy(isLoading = false)
+                        }
+                        uiState.value = uiState.value.copy(filmList = uiItemList)
+                    }
+
+                    is DownloadProgress.Error -> {}
+
+                    is DownloadProgress.Progress -> {
+                        val uiItemList = processList(filmCard, previousList){ uiItem ->
+                            uiItem.copy(loadingProgress = downloadProgress.progress, isLoading = true)
+                        }
+                        uiState.value = uiState.value.copy(filmList = uiItemList)
+                    }
+                }
+            }
         }
     }
 
+    private suspend fun processList(filmCard: FilmCard,
+                                    previousList: List<UiItem>,
+                                    mapCallback: (UiItem) -> UiItem
+    ): List<UiItem> = withContext(Dispatchers.IO){
+        return@withContext  previousList.map { uiItem ->
+            if (uiItem.filmCard == filmCard){
+                mapCallback(uiItem)
+            }
+            else
+                uiItem
+        }
+    }
     override fun itemClick(filmCard: FilmCard, navController: NavController) {
         Log.d("RemoteMainViewModel", "itemClick: navigate to${filmCard.filmId}")
         navController.navigate("remoteDetails/${filmCard.filmId}")
@@ -87,12 +121,13 @@ class RemoteMainViewModel @Inject constructor(
     }
 
     private fun checkLoadedData(internetAvailable: Boolean, filmList: List<FilmCard>) {
-        if (!internetAvailable) {
-            if (filmList.isEmpty()) {
-                uiState.value = uiState.value.copy(internetAbility = false)
-            } else {
-                uiState.value = uiState.value.copy(internetAbility = true)
-            }
+        if (internetAvailable) {
+            uiState.value = uiState.value.copy(internetAbility = true)
+            return
+        }
+
+        if (filmList.isEmpty()) {
+            uiState.value = uiState.value.copy(internetAbility = false)
         } else {
             uiState.value = uiState.value.copy(internetAbility = true)
         }
@@ -100,12 +135,19 @@ class RemoteMainViewModel @Inject constructor(
 
     private fun convertToUiModel(cardList: List<FilmCard>, favoritesList: List<Int>): List<UiItem> {
         return cardList.map { film ->
-            UiItem(film, favoritesList.contains(film.filmId))
+            UiItem(film, favoritesList.contains(film.filmId), false)
         }
     }
+
     private fun mergePreviousResult(favoritesList: List<Int>, uiItemList: List<UiItem>) {
         uiState.value = uiState.value.copy(
-           filmList =  uiItemList.map { UiItem(it.filmCard, favoritesList.contains(it.filmCard.filmId)) }
+            filmList = uiItemList.map {
+                UiItem(
+                    it.filmCard,
+                    favoritesList.contains(it.filmCard.filmId),
+                    false
+                )
+            }
         )
     }
 }

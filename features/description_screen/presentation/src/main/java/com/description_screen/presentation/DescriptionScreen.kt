@@ -45,7 +45,7 @@ import dagger.hilt.android.lifecycle.withCreationCallback
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DescriptionScreen(
+fun DescriptionScreen(
     descriptionState: FilmDescription,
     navController: NavController
 ) {
@@ -122,29 +122,4 @@ private fun DescriptionScreen(
             }
         }
     )
-}
-@Composable
-fun DescriptionScreenFromLocal(
-    id: Int,
-    navController: NavController
-){
-    Log.d("TAG", "MyApp: receive ${id}")
-    val remoteViewModel = hiltViewModel<DescriptionLocalViewModel, DescriptionLocalViewModel.ViewModelFactory> { factory ->
-        factory.create(id)
-    }
-    val descriptionState by remoteViewModel.getUiState().collectAsState()
-    DescriptionScreen(descriptionState, navController)
-}
-
-@Composable
-fun DescriptionScreenFromRemote(
-    id: Int,
-    navController: NavController
-){
-    Log.d("TAG", "MyApp: receive ${id}")
-    val remoteViewModel = hiltViewModel<DescriptionRemoteViewModel, DescriptionRemoteViewModel.ViewModelFactory> { factory ->
-        factory.create(id)
-    }
-    val descriptionState by remoteViewModel.getUiState().collectAsState()
-    DescriptionScreen(descriptionState, navController)
 }

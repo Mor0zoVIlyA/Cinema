@@ -24,7 +24,7 @@ class LocalMainViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             getListFromDataBase.getList().collect{ filmList ->
-                uiState.value = uiState.value.copy(filmList = filmList.map { UiItem(it, true) })
+                uiState.value = uiState.value.copy(filmList = filmList.map { UiItem(it, true, false) })
             }
         }
     }

@@ -7,5 +7,5 @@ import javax.inject.Inject
 class SaveToDataBaseUseCase @Inject constructor(
     private val localRepository: LocalRepository
 ) {
-    suspend fun saveFilm(filmCard: FilmCard) = localRepository.saveFilm(filmCard)
+    fun saveFilm(filmCard: FilmCard) = localRepository.saveFilmWithProgress(filmCard)
 }
