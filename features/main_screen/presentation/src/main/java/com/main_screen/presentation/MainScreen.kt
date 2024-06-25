@@ -98,7 +98,7 @@ fun MainScreen(
                                     .weight(1f)
                             ) {
                                 items(state.filmList) { film ->
-                                    FilmItem2(
+                                    FilmItem(
                                         uiItem = film,
                                         itemClick = itemClick,
                                         longItemClick = longItemClick,
@@ -150,80 +150,9 @@ fun shimmerBrush(showShimmer: Boolean = true, targetValue: Float = 1000f): Brush
     }
 }
 
-
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun FilmItem(
-    uiItem: UiItem,
-    itemClick: (FilmCard, NavController) -> Unit,
-    longItemClick: (FilmCard) -> Unit,
-    deleteClick: (FilmCard, Boolean) -> Unit,
-    navController: NavController
-) {
-    val hapticFeedBack = LocalHapticFeedback.current
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = {
-                    itemClick(uiItem.filmCard, navController)
-                },
-                onLongClick = {
-                    longItemClick(uiItem.filmCard)
-                    hapticFeedBack.performHapticFeedback(HapticFeedbackType.LongPress)
-                },
-            )
-    ) {
-        val showShimmer = remember { mutableStateOf(true) }
-        Box(
-            modifier = Modifier
-                .width(150.dp)
-                .height(220.dp)
-                .background(shimmerBrush(targetValue = 1300f, showShimmer = showShimmer.value))
-        ) {
-            SubcomposeAsyncImage(
-                model = uiItem.filmCard.posterUrl,
-                contentDescription = "Profile Picture",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.matchParentSize()
-            ) {
-                val state = painter.state
-                if (state is AsyncImagePainter.State.Success) {
-                    showShimmer.value = false
-                    SubcomposeAsyncImageContent()
-                }
-            }
-        }
-
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(uiItem.filmCard.year)
-                Text(uiItem.filmCard.nameRu)
-            }
-
-            Checkbox(
-                checked = uiItem.isFavorites,
-                onCheckedChange = {
-                    deleteClick(uiItem.filmCard, uiItem.isFavorites)
-                },
-
-                )
-        }
-    }
-}
-
-
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun FilmItem2(
     uiItem: UiItem,
     itemClick: (FilmCard, NavController) -> Unit,
     longItemClick: (FilmCard) -> Unit,
@@ -318,14 +247,24 @@ fun FilmItem2(
 
 @Composable
 fun HorizontalProgressBar(progress: Float) {
-    LinearProgressIndicator(
-        progress = progress,
+    val cornerRadius = 4.dp
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .height(8.dp),
-        color = MaterialTheme.colorScheme.primary,
-        trackColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
-    )
+            .height(8.dp)
+            .clip(RoundedCornerShape(cornerRadius))
+            .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
+    ) {
+        LinearProgressIndicator(
+            progress = progress,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(8.dp)
+                .clip(RoundedCornerShape(cornerRadius)),
+            color = MaterialTheme.colorScheme.primary,
+            trackColor = Color.Transparent
+        )
+    }
 }
 
 @Composable
@@ -395,5 +334,5 @@ fun NoInternetScreen() {
 @Preview
 @Composable
 private fun PanelWithButtonPreview() {
-
+    HorizontalProgressBar(0.4f)
 }
