@@ -63,7 +63,8 @@ fun MyApp(activity: MainActivity) {
                         navController.navigate("localMainScreen")
                     }
                 },
-                deleteClick = mainViewModel::delete
+                deleteClick = mainViewModel::delete,
+                singleMessage = mainViewModel.errorMessageState()
 
             )
         }
@@ -80,7 +81,8 @@ fun MyApp(activity: MainActivity) {
                         navController.navigate("remoteMainScreen")
                     }
                 },
-                deleteClick = mainViewModel::delete
+                deleteClick = mainViewModel::delete,
+                singleMessage = mainViewModel.errorMessageState()
             )
         }
         composable("remoteDetails/{itemId}") { backStackEntry ->

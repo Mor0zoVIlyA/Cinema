@@ -1,5 +1,6 @@
 package com.main_screen.presentation
 
+import android.widget.Toast
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -46,6 +48,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -62,6 +65,7 @@ import coil.compose.SubcomposeAsyncImageContent
 import com.main_screen.domain.FilmCard
 import com.main_screen.presentation.us_state.UiItem
 import com.main_screen.presentation.us_state.UiState
+import kotlinx.coroutines.flow.SharedFlow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -72,8 +76,10 @@ fun MainScreen(
     longItemClick: (FilmCard) -> Unit,
     deleteClick: (FilmCard, Boolean) -> Unit,
     navController: NavController,
-    bottomPanel: @Composable () -> Unit
+    bottomPanel: @Composable () -> Unit,
+    singleMessage: SharedFlow<String>,
 ) {
+    val context = LocalContext.current
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
@@ -113,7 +119,11 @@ fun MainScreen(
                 bottomPanel()
             }
 
-
+            LaunchedEffect(Unit){
+                singleMessage.collect{ singleMessage ->
+                    Toast.makeText(context, singleMessage, Toast.LENGTH_SHORT).show()
+                }
+            }
         }
     )
 

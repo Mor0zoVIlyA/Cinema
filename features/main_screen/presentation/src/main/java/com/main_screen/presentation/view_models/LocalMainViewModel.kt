@@ -9,8 +9,11 @@ import com.main_screen.presentation.R
 import com.main_screen.presentation.us_state.UiItem
 import com.main_screen.presentation.us_state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +35,11 @@ class LocalMainViewModel @Inject constructor(
         return uiState.asStateFlow()
     }
 
+    override fun errorMessageState(): SharedFlow<String> {
+        return MutableSharedFlow<String>().asSharedFlow()
+    }
+
     override fun longClick(filmCard: FilmCard) {
-        TODO("Not yet implemented")
     }
 
     override fun itemClick(filmCard: FilmCard, navController: NavController) {
